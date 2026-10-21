@@ -23,6 +23,12 @@ typedef struct
     string name;
 } template_t;
 
+typedef struct
+{
+    double confidence;
+    string name;
+} result_t;
+
 class Templates
 {
     public:
@@ -41,11 +47,8 @@ class Templates
         }
     }
 
-    string Match(const Mat& image, double threshold)
+    void Match(const Mat& image, vector<result_t>& results)
     {
-        double highestValue = 0;
-        int highestValueIndex = 0;
-
         for (int i = 0; i < templates.size(); i++)
         {
             Mat dst;
@@ -54,17 +57,9 @@ class Templates
             double maxValue;
             minMaxLoc( dst, NULL, &maxValue);
 
-            if (maxValue > highestValue)
-            {
-                highestValueIndex = i;
-                highestValue = maxValue;
-            }
+            result_t result= {.confidence = maxValue, .name = templates[i].name};
+            results.push_back(result);
         }
-
-        if (highestValue < threshold)
-            return "\0";
-
-        return templates[highestValueIndex].name;
     }
 
 
